@@ -5,6 +5,8 @@ import Entypo from '@expo/vector-icons/Entypo';
 const Chatbot = () => {
   const [userQuery, setUserQuery] = useState('');
   const [chatHistory, setChatHistory] = useState<Array<{type: string, text: string}>>([]);
+  const [NumberofDailyQueries, setNumberofDailyQueries] = useState(0);
+  const actualUserId = 1;
 
   const handleSend = async () => {
     if (!userQuery) return;
@@ -14,8 +16,20 @@ const Chatbot = () => {
     setChatHistory(newChatHistory);
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/recommend?user_query=${encodeURIComponent(userQuery)}`);
-      setUserQuery('');
+      // Increment the daily queries counter
+      const newQueryCount = NumberofDailyQueries + 1;
+      setNumberofDailyQueries(newQueryCount);
+
+      console.log(`Fetching URL: http://127.0.0.1:5000/recommend?user_query=${encodeURIComponent(userQuery)}&user_id=${actualUserId}&daily_query_number=${newQueryCount}`);
+
+      // Update the fetch request with new parameters
+      const response = await fetch(
+        `http://127.0.0.1:5000/recommend?` + 
+        `user_query=${encodeURIComponent(userQuery)}` +
+        `&user_id=${actualUserId}` + // Ensure actualUserId is defined and holds the correct user ID
+        `&daily_query_number=${newQueryCount}`
+      );
+      
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -27,6 +41,7 @@ const Chatbot = () => {
       console.error('Error fetching recommendation:', error);
       setChatHistory((prev) => [...prev, { type: 'bot', text: 'Error fetching response.' }]);
     }
+    setUserQuery('');
 
   };
 

@@ -69,6 +69,8 @@ def recommend_menu_items():
         # Fetch all menu items
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
+        
+        # Fetch menu items
         query = "SELECT * FROM public.dining_hall_menu;"
         cursor.execute(query)
         items = cursor.fetchall()
@@ -80,7 +82,15 @@ def recommend_menu_items():
 
         # Prepare the input for LangChain
         user_query = request.args.get('user_query') 
-        
+        user_id = request.args.get('user_id')
+        daily_query_number = request.args.get('daily_query_number')
+        print(f"User ID: {user_id}, User Query: {user_query}, Daily Query Number: {daily_query_number}")
+
+        # Insert the user query into the database
+        insert_query = "INSERT INTO queries (user_id, query_text, queries_today) VALUES (%s, %s, %s)"
+        cursor.execute(insert_query, (user_id, user_query, daily_query_number))
+        conn.commit()  # Commit the transaction
+
         model = ChatOpenAI(model="gpt-4o-mini")
 
         messages = [
@@ -101,8 +111,8 @@ def recommend_menu_items():
         print(f"Error in recommendation: {e}")
         return jsonify({"error": "Recommendation failed"}), 500
     finally:
-        cursor.close()
-        conn.close()
+        cursor.close()  # Close the cursor
+        conn.close()    # Close the connection
         
 @app.route('/menu', methods=['GET'])
 def get_menu_items():
