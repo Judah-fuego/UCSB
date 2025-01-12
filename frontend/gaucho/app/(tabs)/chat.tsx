@@ -16,17 +16,15 @@ const Chatbot = () => {
     setChatHistory(newChatHistory);
 
     try {
-      // Increment the daily queries counter
       const newQueryCount = NumberofDailyQueries + 1;
       setNumberofDailyQueries(newQueryCount);
 
       console.log(`Fetching URL: http://127.0.0.1:5000/recommend?user_query=${encodeURIComponent(userQuery)}&user_id=${actualUserId}&daily_query_number=${newQueryCount}`);
 
-      // Update the fetch request with new parameters
       const response = await fetch(
         `http://127.0.0.1:5000/recommend?` + 
         `user_query=${encodeURIComponent(userQuery)}` +
-        `&user_id=${actualUserId}` + // Ensure actualUserId is defined and holds the correct user ID
+        `&user_id=${actualUserId}` + 
         `&daily_query_number=${newQueryCount}`
       );
       
@@ -35,7 +33,6 @@ const Chatbot = () => {
       }
       const data = await response.json();
 
-      // Save bot response to chat history
       setChatHistory((prev) => [...prev, { type: 'bot', text: data }]);
     } catch (error) {
       console.error('Error fetching recommendation:', error);

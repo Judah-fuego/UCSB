@@ -68,6 +68,12 @@ export default function CustomModal({ visible, onClose, waitTime, menuItems }) {
     },
   };
 
+  const getWaitTimeColor = (waitTime) => {
+    if (waitTime <= 10) return 'green';
+    if (waitTime <= 20) return 'orange';
+    return 'red';
+  };
+
   return (
     <Modal
       animationType="slide"
@@ -77,8 +83,10 @@ export default function CustomModal({ visible, onClose, waitTime, menuItems }) {
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.headerText}>Wait Time Info</Text>
-          <Text style={styles.waitTimeText}>Current Wait Time: {waitTime} minutes</Text>
+          <Text style={styles.headerText}>Wait Time 'location'</Text>
+          <Text style={[styles.waitTimeText, { color: getWaitTimeColor(waitTime) }]}>
+            Current Wait Time: {waitTime} minutes
+          </Text>
 
           <Text style={styles.sectionTitle}>Menu Items</Text>
           {menuItems.length > 0 ? (
@@ -126,27 +134,37 @@ export default function CustomModal({ visible, onClose, waitTime, menuItems }) {
           </ScrollView>
 
           <ScrollView horizontal >
-            <BarChart
-              data={{
-                labels: Object.keys(averageTimes[selectedDay]),
-                datasets: [
-                  {
-                    data: Object.values(averageTimes[selectedDay]),
-                  },
-                ],
-              }}
-              width={350} // Adjust based on your layout
-              height={200}
-              chartConfig={{
-                backgroundColor: '#ffffff',
-                backgroundGradientFrom: '#ffffff',
-                backgroundGradientTo: '#ffffff',
-                color: (opacity = 1) => `rgba(34, 128, 176, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                barPercentage: 0.5,
-              }}
-              style={styles.barChart}
-            />
+          <BarChart
+  data={{
+    labels: Object.keys(averageTimes[selectedDay]).map((time) => {
+      // Convert 24-hour time to 12-hour time with AM/PM
+      const [hour, minute] = time.split(':');
+      const hourInt = parseInt(hour, 10);
+      const isPM = hourInt >= 12;
+      const displayHour = hourInt % 12 || 12; // Convert to 12-hour format
+      return `${displayHour}${isPM ? ' PM' : ' AM'}`;
+    }),
+    datasets: [
+      {
+        data: Object.values(averageTimes[selectedDay]),
+      },
+    ],
+  }}
+  width={350} // Adjust based on your layout
+  height={200}
+  chartConfig={{
+    backgroundColor: '#ffffff',
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    color: (opacity = 1) => `rgba(34, 128, 176, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    barPercentage: 0.5,
+  }}
+  style={styles.barChart}
+  yAxisSuffix=" mins" // Add 'mins' suffix to Y-axis labels
+  xLabelsOffset={-10} // Adjust position of x-axis labels
+  verticalLabelRotation={30} // Rotate labels slightly for better readability
+/>
           </ScrollView>
 
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>

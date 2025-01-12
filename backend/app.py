@@ -14,16 +14,15 @@ from langchain_openai import ChatOpenAI
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:8081"}})  # Allow requests from this origin
- # Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "http://localhost:8081"}}) 
 
 # Database connection configuration
 db_config = {
-    'dbname': 'gaucho',  # Replace with your actual database name
-    'user': 'postgres',   # Replace with your PostgreSQL username
-    'password': 'root',   # Replace with your PostgreSQL password
-    'host': 'localhost',  # Usually 'localhost' for local development
-    'port': 5432          # Default PostgreSQL port
+    'dbname': 'gaucho',
+    'user': 'postgres', 
+    'password': 'root',  
+    'host': 'localhost',  
+    'port': 5432          
 }
 
 @app.route('/wait_time', methods=['GET'])
@@ -49,9 +48,8 @@ def get_current_wait_time():
         ) AS first_five_wait_times;
         """
 
-        # Execute the query
         cursor.execute(query, (dining_hall.lower(),))
-        average_wait_time = cursor.fetchone()[0]  # Fetch the average wait time
+        average_wait_time = cursor.fetchone()[0] 
 
         return jsonify({"average_wait_time": average_wait_time}), 200
 
@@ -70,7 +68,6 @@ def recommend_menu_items():
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
         
-        # Fetch menu items
         query = "SELECT * FROM public.dining_hall_menu;"
         cursor.execute(query)
         items = cursor.fetchall()
@@ -89,7 +86,7 @@ def recommend_menu_items():
         # Insert the user query into the database
         insert_query = "INSERT INTO queries (user_id, query_text, queries_today) VALUES (%s, %s, %s)"
         cursor.execute(insert_query, (user_id, user_query, daily_query_number))
-        conn.commit()  # Commit the transaction
+        conn.commit() 
 
         model = ChatOpenAI(model="gpt-4o-mini")
 
@@ -100,12 +97,10 @@ def recommend_menu_items():
         ("human", user_query),
         ]
 
-        # Get recommendations from LangChain
         ai_msg = model.invoke(messages)
-        recommendations = ai_msg.content  # Assuming the response format
+        recommendations = ai_msg.content 
 
-        # Parse recommendation
-        return jsonify(recommendations)  # Return the top 3 recommendations
+        return jsonify(recommendations)
 
     except Exception as e:
         print(f"Error in recommendation: {e}")
@@ -170,10 +165,6 @@ def get_menu_items():
         cursor.close()
         conn.close()
 
-@app.route('/test', methods=['GET'])
-def test():
-    return jsonify({"message": "This is a test route!"})
-
 @app.route('/user_info', methods=['GET'])
 def get_user_info():
     user_id = request.args.get('id')
@@ -181,21 +172,17 @@ def get_user_info():
         return jsonify({"error": "User ID is required"}), 400
 
     try:
-        # Connect to the PostgreSQL database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        # SQL query to get user information based on user ID
         query = "SELECT * FROM users WHERE id = %s;"
         
-        # Execute the query
         cursor.execute(query, (user_id,))
-        user_info = cursor.fetchone()  # Fetch the user information
+        user_info = cursor.fetchone() 
 
         if user_info is None:
             return jsonify({"error": "User not found"}), 404
 
-        # Get column names
         column_names = [desc[0] for desc in cursor.description]
         user_data = dict(zip(column_names, user_info))
 
@@ -211,24 +198,19 @@ def get_user_info():
 @app.route('/menu', methods=['GET'])
 def get_all_menu_items():
     try:
-        # Connect to the PostgreSQL database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        # SQL query to fetch all menu items
         query = "SELECT * FROM dining_hall_menu;"
         
-        # Execute the query
         cursor.execute(query)
         items = cursor.fetchall()
 
-        # Get column names
         column_names = [desc[0] for desc in cursor.description]
 
-        # Convert to a list of dictionaries
         result = [dict(zip(column_names, row)) for row in items]
 
-        return jsonify(result)  # Return items as JSON
+        return jsonify(result)  
 
     except Exception as e:
         print(f"Error connecting to the database: {e}")

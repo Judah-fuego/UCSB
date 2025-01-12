@@ -1,8 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Button, Switch } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import WrappedModal from '../../components/WrappedModel'; // Adjust the path based on your project structure
 
 export default function AccountScreen() {
+
+  const generateWrappedData = () => {
+    return {
+      mostVisitedLocations: [
+        { location: "Portola", visits: 64 },
+        { location: "De La Guerra", visits: 135 },
+        { location: "Carillo", visits: 36 },
+      ],
+      mostPurchasedItems: [
+        { item: "Steamed Broccoli & Cauliflower (vgn)", count: 64 },
+        { item: "Black Beans (vgn)", count: 65 },
+        { item: "Wheat Tortilla (vgn)", count: 135 },
+      ],
+    };
+  };
+
   const [userInfo, setUserInfo] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [preferences, setPreferences] = useState({
@@ -10,6 +27,8 @@ export default function AccountScreen() {
     wants_vgn: 0,
     wants_w_nuts: 0,
   });
+const [wrappedData, setWrappedData] = useState(generateWrappedData());
+const [wrappedModalVisible, setWrappedModalVisible] = useState(false);
 
   const userId = 1; // Replace with the actual user ID
 
@@ -64,6 +83,8 @@ export default function AccountScreen() {
     }));
   };
 
+  
+
   return (
     <View style={styles.container}>
       <Animatable.View animation="fadeIn" duration={1000}>
@@ -73,10 +94,21 @@ export default function AccountScreen() {
         </View>
       </Animatable.View>
 
+      
+      <WrappedModal
+        visible={wrappedModalVisible}
+        onClose={() => setWrappedModalVisible(false)}
+        data={wrappedData}
+      />
       <ScrollView style={styles.menuContainer}>
+      
         <TouchableOpacity style={styles.menuItem} onPress={() => setModalVisible(true)}>
           <Text style={styles.menuText}>Preferences</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem} onPress={() => setWrappedModalVisible(!wrappedModalVisible)}>
+            <Text style={styles.menuText}>Your 2024 Wrapped</Text>
+        </TouchableOpacity>
+        
         <TouchableOpacity style={styles.menuItem}>
           <Text style={styles.menuText}>Help & Support</Text>
         </TouchableOpacity>
@@ -84,7 +116,7 @@ export default function AccountScreen() {
           <Text style={styles.menuText}>Sign Out</Text>
         </TouchableOpacity>
       </ScrollView>
-
+    
       <Modal
         animationType="slide"
         transparent={true}
@@ -109,7 +141,7 @@ export default function AccountScreen() {
               />
             </View>
             <View style={styles.preferenceRow}>
-              <Text>Wants No Nuts:</Text>
+              <Text>Not Allgeric to Nuts:</Text>
               <Switch
                 value={preferences.wants_w_nuts === 1}
                 onValueChange={() => togglePreference('wants_w_nuts')}
@@ -122,6 +154,8 @@ export default function AccountScreen() {
           </View>
         </View>
       </Modal>
+
+
     </View>
   );
 }

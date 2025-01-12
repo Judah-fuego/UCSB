@@ -95,7 +95,8 @@ export default function ItemList() {
           <View style={styles.topContainer}>
             <Image source={item.image} style={styles.image} />
             <View style={styles.waitTimeContainer}>
-              <Text>Wait time: {formatWaitTime(currentWaitTime[item.name])} </Text>
+              <Text >Wait time: </Text>               
+              <Text style={styles.waitTime} >{formatWaitTime(currentWaitTime[item.name])}  </Text>     
             </View>
           </View>
           <View style={styles.bottomContainer}>
@@ -131,13 +132,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: 250,
+    width: 200,
     height: 120,
     borderRadius: 10,
   },
   waitTimeContainer: {
     justifyContent: 'center',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
+    padding: 30,
+    fontSize: 40,
   },
   bottomContainer: {
     flexDirection: 'row',
@@ -159,4 +162,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
+  waitTime: {
+    fontSize: 20,
+    marginTop: 5,
+  }
 });
