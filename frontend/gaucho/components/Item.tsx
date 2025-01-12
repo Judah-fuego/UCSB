@@ -81,8 +81,10 @@ export default function ItemList() {
       return 'Less than 10 minutes';
     } else if (waitTime >= 10 && waitTime < 15) {
       return 'Less than 15 minutes';
-    } else {
+    }  else if (waitTime >= 20 ) {
       return "Don't go";
+    } else {
+      "Unknown"
     }
   };
 

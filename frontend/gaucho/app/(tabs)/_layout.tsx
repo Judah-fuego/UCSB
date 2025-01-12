@@ -3,6 +3,8 @@ import React from 'react';
 import { Platform } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Octicons from '@expo/vector-icons/Octicons';
+
 
 import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
@@ -31,15 +33,22 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: () => <Ionicons name="home" size={30} color="#fff" />
+          tabBarIcon: () => <Ionicons name="home" size={22} color="#fff" />
           ,
         }}
       />
       <Tabs.Screen
+      name="chat"
+      options={{
+        title: 'Chat',
+        tabBarIcon: () => <Octicons name="light-bulb" size={22} color="white" />,
+      }}
+    />
+      <Tabs.Screen
         name="account"
         options={{
           title: 'Account',
-          tabBarIcon: () =>  <MaterialIcons name="account-circle" size={24} color="white" />,
+          tabBarIcon: () =>  <MaterialIcons name="account-circle" size={22} color="white" />,
         }}
       />
     </Tabs>

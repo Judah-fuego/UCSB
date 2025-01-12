@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Button, Switch } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 
 export default function AccountScreen() {
   const [userInfo, setUserInfo] = useState({});
@@ -65,10 +66,12 @@ export default function AccountScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Hi {userInfo.username}</Text>
-        <Text style={styles.subHeaderText}>{userInfo.email}</Text>
-      </View>
+      <Animatable.View animation="fadeIn" duration={1000}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Hi {userInfo.username}</Text>
+          <Text style={styles.subHeaderText}>{userInfo.email}</Text>
+        </View>
+      </Animatable.View>
 
       <ScrollView style={styles.menuContainer}>
         <TouchableOpacity style={styles.menuItem} onPress={() => setModalVisible(true)}>
@@ -91,30 +94,32 @@ export default function AccountScreen() {
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>Update Preferences</Text>
           <View style={styles.preferenceContainer}>
-            <Text>Wants Vegetarian:</Text>
-            <TouchableOpacity
-              style={[styles.button, preferences.wants_v === 1 && styles.activeButton]}
-              onPress={() => togglePreference('wants_v')}
-            >
-              <Text style={styles.buttonText}>{preferences.wants_v === 1 ? 'Yes' : 'No'}</Text>
-            </TouchableOpacity>
-            <Text>Wants Vegan:</Text>
-            <TouchableOpacity
-              style={[styles.button, preferences.wants_vgn === 1 && styles.activeButton]}
-              onPress={() => togglePreference('wants_vgn')}
-            >
-              <Text style={styles.buttonText}>{preferences.wants_vgn === 1 ? 'Yes' : 'No'}</Text>
-            </TouchableOpacity>
-            <Text>Wants No Nuts:</Text>
-            <TouchableOpacity
-              style={[styles.button, preferences.wants_w_nuts === 1 && styles.activeButton]}
-              onPress={() => togglePreference('wants_w_nuts')}
-            >
-              <Text style={styles.buttonText}>{preferences.wants_w_nuts === 1 ? 'Yes' : 'No'}</Text>
-            </TouchableOpacity>
+            <View style={styles.preferenceRow}>
+              <Text>Wants Vegetarian:</Text>
+              <Switch
+                value={preferences.wants_v === 1}
+                onValueChange={() => togglePreference('wants_v')}
+              />
+            </View>
+            <View style={styles.preferenceRow}>
+              <Text>Wants Vegan:</Text>
+              <Switch
+                value={preferences.wants_vgn === 1}
+                onValueChange={() => togglePreference('wants_vgn')}
+              />
+            </View>
+            <View style={styles.preferenceRow}>
+              <Text>Wants No Nuts:</Text>
+              <Switch
+                value={preferences.wants_w_nuts === 1}
+                onValueChange={() => togglePreference('wants_w_nuts')}
+              />
+            </View>
           </View>
-          <Button title="Submit" onPress={handleUpdatePreferences} />
-          <Button title="Close" onPress={() => setModalVisible(false)} />
+          <View style={styles.buttonContainer}>
+            <Button title="Submit" onPress={handleUpdatePreferences} />
+            <Button title="Close" onPress={() => setModalVisible(false)} />
+          </View>
         </View>
       </Modal>
     </View>
@@ -155,32 +160,27 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: '#d3d3d3', // Light gray background
     padding: 20,
   },
   modalTitle: {
     fontSize: 24,
-    color: '#fff',
+    color: '#000',
     marginBottom: 20,
   },
   preferenceContainer: {
     width: '100%',
     marginBottom: 20,
   },
-  button: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    justifyContent: 'center',
+  preferenceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)', // Semi-transparent background
+    marginBottom: 10,
   },
-  activeButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.6)', // More opaque when active
-  },
-  buttonText: {
-    color: '#fff',
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
 });

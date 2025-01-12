@@ -1,6 +1,17 @@
 from flask import Flask, jsonify, request
 import psycopg2
 from flask_cors import CORS
+import getpass
+from dotenv import load_dotenv
+import os 
+
+
+load_dotenv()  
+openai_api_key = os.getenv("OPENAI_API_KEY")
+from langchain_openai import ChatOpenAI
+
+
+
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:8081"}})  # Allow requests from this origin
@@ -51,6 +62,48 @@ def get_current_wait_time():
         cursor.close()
         conn.close()
 
+
+@app.route('/recommend', methods=['GET'])
+def recommend_menu_items():
+    try:
+        # Fetch all menu items
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        query = "SELECT * FROM public.dining_hall_menu;"
+        cursor.execute(query)
+        items = cursor.fetchall()
+        formatted_items = [
+            f"{item[1]}: {item[4]} (Dining Hall: {item[1]}, Time: {item[3]})" 
+            for item in items
+        ]
+        print(formatted_items)
+
+        # Prepare the input for LangChain
+        user_query = request.args.get('user_query') 
+        
+        model = ChatOpenAI(model="gpt-4o-mini")
+
+        messages = [
+        (
+        "system",
+                f"You are a helpful assistant that recommends initially only 2 menu items unless they ask for more. Keep it concise from the University of California Santa Barbara Menu Items from their three dining halls Portola, La De Guerra, or Carrillo . Present the information in a very clear manner as well showing at which dining hall and what the food is. Here are the menu item names: {', '.join(formatted_items)}.",        ),
+        ("human", user_query),
+        ]
+
+        # Get recommendations from LangChain
+        ai_msg = model.invoke(messages)
+        recommendations = ai_msg.content  # Assuming the response format
+
+        # Parse recommendation
+        return jsonify(recommendations)  # Return the top 3 recommendations
+
+    except Exception as e:
+        print(f"Error in recommendation: {e}")
+        return jsonify({"error": "Recommendation failed"}), 500
+    finally:
+        cursor.close()
+        conn.close()
+        
 @app.route('/menu', methods=['GET'])
 def get_menu_items():
     user_id = request.args.get('userId') 
@@ -137,6 +190,35 @@ def get_user_info():
         user_data = dict(zip(column_names, user_info))
 
         return jsonify(user_data), 200
+
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
+        return jsonify({"error": "Database connection failed"}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/menu', methods=['GET'])
+def get_all_menu_items():
+    try:
+        # Connect to the PostgreSQL database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        # SQL query to fetch all menu items
+        query = "SELECT * FROM dining_hall_menu;"
+        
+        # Execute the query
+        cursor.execute(query)
+        items = cursor.fetchall()
+
+        # Get column names
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convert to a list of dictionaries
+        result = [dict(zip(column_names, row)) for row in items]
+
+        return jsonify(result)  # Return items as JSON
 
     except Exception as e:
         print(f"Error connecting to the database: {e}")
