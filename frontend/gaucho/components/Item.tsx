@@ -122,8 +122,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    borderColor: '#083464',
+    borderRadius: 10,
   },
   topContainer: {
     flexDirection: 'row',
@@ -131,9 +131,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: 100,
-    height: 100,
-    borderRadius: 5,
+    width: 250,
+    height: 120,
+    borderRadius: 10,
   },
   waitTimeContainer: {
     justifyContent: 'center',
