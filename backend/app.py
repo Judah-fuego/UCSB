@@ -106,8 +106,8 @@ def recommend_menu_items():
         print(f"Error in recommendation: {e}")
         return jsonify({"error": "Recommendation failed"}), 500
     finally:
-        cursor.close()  # Close the cursor
-        conn.close()    # Close the connection
+        cursor.close()
+        conn.close()
         
 @app.route('/menu', methods=['GET'])
 def get_menu_items():
@@ -117,7 +117,6 @@ def get_menu_items():
         return jsonify({"error": "User ID is required"}), 400
 
     try:
-        # Connect to the PostgreSQL database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
@@ -156,7 +155,7 @@ def get_menu_items():
 
         result = [dict(zip(column_names, row)) for row in items]
 
-        return jsonify(result)  # Return items as JSON
+        return jsonify(result)
 
     except Exception as e:
         print(f"Error connecting to the database: {e}")
@@ -231,7 +230,7 @@ def update_user_preferences():
         return jsonify({"error": "User ID is required"}), 400
 
     try:
-        # Connect to the PostgreSQL database
+      
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
@@ -242,9 +241,9 @@ def update_user_preferences():
         WHERE id = %s;
         """
         
-        # Execute the query
+        
         cursor.execute(query, (wants_v, wants_vgn, wants_w_nuts, user_id))
-        conn.commit()  # Commit the changes
+        conn.commit() 
 
         return jsonify({"message": "User preferences updated successfully"}), 200
 
@@ -256,4 +255,4 @@ def update_user_preferences():
         conn.close()
 
 if __name__ == '__main__':
-    app.run(port=5000)  # Run the Flask app on port 5000
+    app.run(port=5000) 
