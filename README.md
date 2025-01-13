@@ -1,3 +1,7 @@
+Gaucho Grubs
+
+The best UCSB dining hall app!
+
 **Inspiration**
 
 Waiting in long lines for the dining hall is frustrating, and one method that UCSB provides to solve this problem is offering live feed of the lines outside the dining hall. However, this does not provide an accurate measure of wait times, which reduces its utility. Furthermore, searching through all the menu items to determine which dining hall’s options caters to preferences and dietary restrictions is time consuming.
